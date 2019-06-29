@@ -1,5 +1,4 @@
 #use "sintaxe.ml"
-#use "result.ml"
 
 let rec evaluate (envmnt : env) (e : expr) = (
 	match e with
@@ -47,7 +46,15 @@ let rec evaluate (envmnt : env) (e : expr) = (
 						| (_, RRaise) -> RRaise
 						| (_, _) -> Vpair(e1', e2')
 				)
-		)
+    )
+    (* BS-Fst *)
+    | Fst(e1) -> (
+
+    )
+    (* BS-Snd *)
+    | Snd(e1) -> (
+      
+    )
 		(* If rules *)
 		| If(e1, e2, e3) -> ( 
 			let e1' = evaluate envmnt e1 in (

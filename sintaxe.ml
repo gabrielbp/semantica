@@ -19,7 +19,9 @@ type expr = Ncte of int
           | Bcte of bool
           | Binop of bop * expr * expr
           | Unop of uop * expr
-          | Pair of expr * expr  
+          | Pair of expr * expr
+          | Fst of expr
+          | Snd of expr
           | If of expr * expr * expr 
           | Var of variable 
           | App of expr * expr 

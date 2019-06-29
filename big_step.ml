@@ -95,7 +95,7 @@ let rec evaluate (envmnt : env) (e : expr) = (
 									| (_, _) -> RRaise
 							)
 		(* BS-Fn *)
-		| Lam(x, e1) -> Vclos(x, e1, envmnt)
+		| Fun(x, e1) -> Vclos(x, e1, envmnt)
 		(* BS-Let *)
 		| Let(x, e1, e2) -> let e1' = evaluate envmnt e1 in (
 								match(e1') with

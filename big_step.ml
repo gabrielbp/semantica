@@ -1,5 +1,5 @@
 #use "sintaxe.ml"
-#use "resultados.ml"
+#use "result.ml"
 
 let rec evaluate (envmnt : env) (e : expr) = (
 	match e with

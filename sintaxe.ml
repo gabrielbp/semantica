@@ -25,7 +25,7 @@ type expr = Ncte of int
           | If of expr * expr * expr 
           | Var of variable 
           | App of expr * expr 
-          | Lam of variable * expr
+          | Fun of variable * expr
           | Let of variable * expr * expr
           | Lrec of variable *  variable * expr * expr
           | Nil
@@ -35,3 +35,14 @@ type expr = Ncte of int
           | Tl of expr
           | Raise
           | Try of expr * expr
+
+type result = Vnum of int 
+          | Vbool of bool 
+          | Vpair of result * result
+          | Vnil
+          | Vcons of result * result 
+          | Vclos of variable * expr * env
+          | Vrclos of variable * variable * expr * env
+          | RRaise
+and  
+   env = (variable * result) list          

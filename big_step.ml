@@ -49,14 +49,26 @@ let rec evaluate (envmnt : env) (e : expr) = (
     )
     (* BS-Fst *)
     | Fst(e1) -> (
-
-    )
+			let e1' = evaluate envmnt e1 in (
+				match(e1') with
+				  Vpair(v1, v2) -> v1
+				| Vnil -> RRaise
+				| RRaise -> RRaise
+				| _ -> RRaise
+			)
+		)
     (* BS-Snd *)
     | Snd(e1) -> (
-      
-    )
+			let e1' = evaluate envmnt e1 in (
+				match(e1') with
+				  Vpair(v1, v2) -> v2
+				| Vnil -> RRaise
+				| RRaise -> RRaise
+				| _ -> RRaise
+			)
+		)
 		(* If rules *)
-		| If(e1, e2, e3) -> ( 
+		| If(e1, e2, e3) -> (
 			let e1' = evaluate envmnt e1 in (
 				match(e1') with
 					(Vbool true) -> evaluate envmnt e2 (* BS-IfTr *)

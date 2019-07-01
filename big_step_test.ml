@@ -1,4 +1,4 @@
-#use "bs_eval.ml"
+#use "big_step.ml"
 
 let num_test = evaluate [] (Ncte(1));; (* must return Vnum 1 *)
 
@@ -16,14 +16,14 @@ let id_test = evaluate [("x", Vnum(5))] (Var("x"));; (* must return Vnum 5 *)
 
 let id_test_r = evaluate [("x", Vnum(5))] (Var("y"));; (* must return RRaise *)
 
-let fn_test = evaluate [] (Lam("x", Var("x")));; (* identity function: must return Vclos("x", Var "x", []) *)
+let fn_test = evaluate [] (Fun("x", Var("x")));; (* identity function: must return Vclos("x", Var "x", []) *)
 
-let app_test = evaluate [] (App(App(Lam( "x",
+let app_test = evaluate [] (App(App(Fun( "x",
 					Try(If( Binop(Gt, Var("x"), Ncte(0)),
-						Lam("y", Binop(Sum, Var("y"), Ncte(1))),
-						Lam("z", Var("z"))
+						Fun("y", Binop(Sum, Var("y"), Ncte(1))),
+						Fun("z", Var("z"))
 					    ),
-					    Lam("w", Var("w"))
+					    Fun("w", Var("w"))
 					)
 				   ),
 				   Ncte(4)),

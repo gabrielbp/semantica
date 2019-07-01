@@ -12,19 +12,19 @@ type bop = Sum   (* + *)
          | Le    (* <= *)
          | Gt    (* > *)
          | Ge    (* >= *)
- 
+
 type uop = Not
 
-type expr = Ncte of int 
+type expr = Ncte of int
           | Bcte of bool
           | Binop of bop * expr * expr
           | Unop of uop * expr
           | Pair of expr * expr
           | Fst of expr
           | Snd of expr
-          | If of expr * expr * expr 
-          | Var of variable 
-          | App of expr * expr 
+          | If of expr * expr * expr
+          | Id of variable
+          | App of expr * expr
           | Fun of variable * expr
           | Let of variable * expr * expr
           | Lrec of variable *  variable * expr * expr
@@ -36,13 +36,17 @@ type expr = Ncte of int
           | Raise
           | Try of expr * expr
 
-type result = Vnum of int 
-          | Vbool of bool 
+type tipo = TyInt | TyBool | TyFn of tipo * tipo | TyList of tipo | TyId of string | TyPair of tipo * tipo
+
+type result = Vnum of int
+          | Vbool of bool
           | Vpair of result * result
           | Vnil
-          | Vcons of result * result 
+          | Vcons of result * result
           | Vclos of variable * expr * env
           | Vrclos of variable * variable * expr * env
           | RRaise
-and  
-   env = (variable * result) list          
+and
+   env = (variable * result) list
+and
+   env2 = (variable * tipo) list

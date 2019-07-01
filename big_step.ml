@@ -77,13 +77,6 @@ let rec evaluate (envmnt : env) (e : expr) = (
 					| _ -> RRaise
 			)
 		)
-		(* BS-Id *)
-		| Var(x) -> let rec search_env (envmnt : env) (x : variable) = (
-						match(envmnt) with
-							 [] -> RRaise
-							| (var, res)::rest_env when var = x -> res
-							| _ -> let rest_env = List.tl envmnt in search_env rest_env x
-					) in search_env envmnt x
 		(* Application rules *)
 		| App(e1, e2) -> let e1' = evaluate envmnt e1 in
 							let e2' = evaluate envmnt e2 in (

@@ -2,16 +2,15 @@
 
 exception TypeNotFound of string
 
-type tipo = TyInt | TyBool | TyFn of tipo * tipo | TyList of tipo | TyId of string | TyPair of tipo * tipo
-
 let count = ref (-1);;
 let newVar (c : int ref) = begin incr c; "X" ^ string_of_int (!c) end
 
-let rec get_constraints (envmnt : env) (e : expr) = (
-	match(e) with
+let rec get_constraints (envmnt : env2) (e : expr) = (
+	match e with
 		  Ncte(n) -> (TyInt, [])
 		| Bcte(b) -> (TyBool, [])
-		| Binop(op, e1, e2) -> ( match(op) with
+		| Binop(op, e1, e2) -> (
+			match(op) with
 			  Sum -> let (typeE1, constraintE1) = get_constraints envmnt e1 in
 						let (typeE2, constraintE2) = get_constraints envmnt e2 in
 							let newConstraint = [(typeE1, TyInt); (typeE2, TyInt)] in
@@ -95,8 +94,8 @@ let rec get_constraints (envmnt : env) (e : expr) = (
 (*----------------------------------------------------------------------------------*)
 		| Fun(x, e1) -> let newType = newVar count in
 							let newConstraint = [(x,TyId(newType))] in
-								let (typeE1, constraintE1) = get_constraints (List.concat [newConstraint;envmnt]) e1 in
-									(TyFn(TyId(newType),typeE1), envmnt)
+								let (typeE1, constraintE1) = get_constraints (List.concat[newConstraint; envmnt]) e1 in
+									(TyFn(TyId(newType),typeE1), List.concat[constraintE1])
 
 (*----------------------------------------------------------------------------------*)
 
@@ -114,7 +113,7 @@ let rec get_constraints (envmnt : env) (e : expr) = (
 									let newConstraint2 = [(x2,TyId(newType2))] in
 										let (typeE1,constraintE1) = get_constraints (List.concat [newConstraint1;newConstraint2;envmnt]) e1 in
 											let (typeE2,constraintE2) = get_constraints (List.concat [newConstraint1;envmnt]) e2 in
-												let newConstraint3 = [(newType1,TyFn(TyId(newType2), typeE1))] in
+												let newConstraint3 = [(TyId(newType1),TyFn(TyId(newType2), typeE1))] in
 													(typeE2, List.concat [constraintE1; constraintE2; newConstraint3])
 
 (*----------------------------------------------------------------------------------*)
@@ -140,42 +139,16 @@ let rec get_constraints (envmnt : env) (e : expr) = (
 							let (typeE2, constraintE2) = get_constraints envmnt e2 in
 								let newConstraint = [(typeE1, typeE2)] in
 									(typeE1, List.concat[newConstraint; constraintE1; constraintE2])
-
+		| _ -> (TyInt, [])
 )
 
-let rec unify constraints = match(constraints) with
+
+(*let rec unify constraints =
+ 	match(constraints) with
 	  [] -> []
 	| (TyInt, TyInt)::rest -> unify rest
 	| (TyBool, TyBool)::rest -> unify rest
 	| (TyFn(typeE1, typeE2), TyFn(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
 	| (TyPair(typeE1, typeE2), TyPair(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
 	| (TyList(typeE1), TyList(typeE2))::rest -> unify ((typeE1, typeE2)::rest)
-
-	| (TyId(x), t)::rest ->
-	        if t = TyId(x) then unify rest (* Caso 3 *)
-
-	        else if occurCheck x t then (* Se X ocorre em T, não é uma equação válida*)
-	          raise (UnifyFailed "occurCheck didn't pass: circular type")
-	        else (* Se não, faz a substituição de X por T no resto das equações e chama o Unify novamente. Ainda, adiciona na lista de substituições (X,T)*)
-	          List.append (unify_rec (sustitutionInTyEquation tyX tyT tail)) [(TyId(tyX),tyT)]
-	    | (tyT,TyId(tyX)) :: tail -> (* Caso 5 *)
-	        if tyT = TyId(tyX) then unify_rec tail (* Caso 3 *)
-	        else if occurCheck tyX tyT then (* Se X ocorre em T, não é uma equação válida*)
-	          raise (UnifyFailed "occurCheck didn't pass: circular type")
-	        else (* Se não, faz a substituição de X por T no resto das equações e chama o Unify novamente. Ainda, adiciona na lista de substituições (X,T)*)
-	          List.append (unify_rec (sustitutionInTyEquation tyX tyT tail)) [(TyId(tyX),tyT)]
-
-
-
-	| (TyId(tyX),tyT) :: tail -> (* Caso 4 *)
-        if tyT = TyId(tyX) then unify_rec tail (* Caso 3 *)
-        else if occurCheck tyX tyT then (* Se X ocorre em T, não é uma equação válida*)
-          raise (UnifyFailed "occurCheck didn't pass: circular type")
-        else (* Se não, faz a substituição de X por T no resto das equações e chama o Unify novamente. Ainda, adiciona na lista de substituições (X,T)*)
-          List.append (unify_rec (sustitutionInTyEquation tyX tyT tail)) [(TyId(tyX),tyT)]
-    | (tyT,TyId(tyX)) :: tail -> (* Caso 5 *)
-        if tyT = TyId(tyX) then unify_rec tail (* Caso 3 *)
-        else if occurCheck tyX tyT then (* Se X ocorre em T, não é uma equação válida*)
-          raise (UnifyFailed "occurCheck didn't pass: circular type")
-        else (* Se não, faz a substituição de X por T no resto das equações e chama o Unify novamente. Ainda, adiciona na lista de substituições (X,T)*)
-          List.append (unify_rec (sustitutionInTyEquation tyX tyT tail)) [(TyId(tyX),tyT)]
+*)

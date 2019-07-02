@@ -2,9 +2,11 @@
 
 let num_test = evaluate [] (Ncte(1));; (* deve retornar  Vnum 1 *)
 
-let div_test = evaluate [] (Binop(Div, Ncte(10), Ncte(2)));; (* deve retornar  Vnum 5 *)
+let div_zero_test = evaluate [] (Binop(Div, Ncte(10), Ncte(0)));; (* deve retornar  RRaise *)
 
-let mult_test_r = evaluate [] (Binop(Mult, Ncte(2), Bcte(true)));; (* deve retornar  RRaise *)
+let mult_test = evaluate [] (Binop(Mult, Ncte(2), Ncte(1)));; (* deve retornar  RRaise *)
+
+let div_test = evaluate [] (Binop(Div, Ncte(10), Ncte(2)));; (* deve retornar  Vnum 5 *)
 
 let not_test = evaluate [] (Unop(Not, Bcte(true)));; (* deve retornar  Vbool false *)
 
@@ -23,3 +25,5 @@ let isempty_test = evaluate [] (IsEmpty(Cons(Bcte(true), Bcte(false))));; (* dev
 let try_test = evaluate [] (Try((Binop(Le, Ncte(5), Ncte(2))), (Binop(And, Bcte(true), Bcte(true)))));; (* deve retornar  Vbool false *)
 
 let try_test_ex = evaluate [] (Try((Binop(Sum, Ncte(5), Bcte(true))), (Binop(Or, Bcte(true), Bcte(false)))));; (* deve retornar  Vbool true *)
+
+let mult_test_r = evaluate [] (Binop(Mult, Ncte(2), Bcte(true)));; (* deve retornar  RRaise *)

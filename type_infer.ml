@@ -143,7 +143,7 @@ let rec get_constraints (envmnt : env2) (e : expr) = (
 )
 
 
-(*let rec unify constraints =
+let rec unify constraints =
  	match(constraints) with
 	  [] -> []
 	| (TyInt, TyInt)::rest -> unify rest
@@ -151,4 +151,3 @@ let rec get_constraints (envmnt : env2) (e : expr) = (
 	| (TyFn(typeE1, typeE2), TyFn(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
 	| (TyPair(typeE1, typeE2), TyPair(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
 	| (TyList(typeE1), TyList(typeE2))::rest -> unify ((typeE1, typeE2)::rest)
-*)

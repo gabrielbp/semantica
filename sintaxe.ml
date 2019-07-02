@@ -48,5 +48,5 @@ type result = Vnum of int
           | RRaise
 and
    env = (variable * result) list
-and
-   env2 = (variable * tipo) list
+
+type   typeEnv = (variable * tipo) list

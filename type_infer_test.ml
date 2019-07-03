@@ -2,6 +2,8 @@
 
 let num_test = get_constraints [] (Ncte(1));; (* deve retornar  (TyInt, []) *)
 
+let id_test = get_constraints [] (Fn("X", Binop(Sum, Id("Y"), Ncte(5))));; (* deve retornar  Vnum 5 *)
+
 let div_test = get_constraints [] (Binop(Div, Ncte(10), Ncte(2)));; (* deve retornar  Vnum 5 *)
 
 let mult_test_r = get_constraints [] (Binop(Mult, Ncte(2), Bcte(true)));; (* deve retornar  RRaise *)

@@ -96,7 +96,7 @@ let rec evaluate (envmnt : env) (e : expr) = (
 						)
 					)
 		(* BS-Fn *)
-		| Fun(x, e1) -> Vclos(x, e1, envmnt) (* acho que tem que avaliar e1*)
+		| Fn(x, e1) -> Vclos(x, e1, envmnt)
 		(* BS-Let *)
 		| Let(x, e1, e2) -> let e1' = evaluate envmnt e1 in (
 								match(e1') with
@@ -104,7 +104,7 @@ let rec evaluate (envmnt : env) (e : expr) = (
 									| _ -> evaluate ((x, e1')::envmnt) e2
 							)
 		(* BS-LetRec *)
-		| Lrec(f, x, e1, e2) -> let rclos = Vrclos(f, x, e1, envmnt) in evaluate ((f, rclos)::envmnt) e2
+		| Letrec(f, x, e1, e2) -> let rclos = Vrclos(f, x, e1, envmnt) in evaluate ((f, rclos)::envmnt) e2
 		(*List extension rules *)
 		| Nil -> Vnil
 		| Cons(e1, e2) -> (

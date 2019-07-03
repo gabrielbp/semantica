@@ -2,6 +2,7 @@
 
 exception TypeNotFound of string
 exception VariavelNaoDeclarada of string
+exception FalhaNoUnify of string
 
 let count = ref (-1);;
 let newVar (c : int ref) = begin incr c; "X" ^ string_of_int (!c) end
@@ -185,13 +186,30 @@ let rec get_constraints (envmnt : typeEnv) (e : expr) = (
 		)
 )
 
-
-
+let rec occurCheck (t: tipo) (x: variable) =
+	match (t) with
+		 TyInt  -> false
+		|TyBool -> false
+		|TyList(typeE) -> occurCheck typeE x
+		|TyFn(typeE1, typeE2) ->
+			if (occurCheck typeE1 x) then true else (occurCheck typeE2 x)
+		|TyPair(typeE1, typeE2) ->
+			if (occurCheck typeE1 x) then true else (occurCheck typeE2 x)
+		|TyId(variavel) -> if variavel = x then true else false
+		
+(*
 let rec unify constraints =
  	match(constraints) with
 	  [] -> []
 	| (TyInt, TyInt)::rest -> unify rest
 	| (TyBool, TyBool)::rest -> unify rest
+	| (TyList(typeE1), TyList(typeE2))::rest -> unify ((typeE1, typeE2)::rest)
 	| (TyFn(typeE1, typeE2), TyFn(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
 	| (TyPair(typeE1, typeE2), TyPair(typeE3, typeE4))::rest -> unify ((typeE1, typeE3)::(typeE2, typeE4)::rest)
-	| (TyList(typeE1), TyList(typeE2))::rest -> unify ((typeE1, typeE2)::rest)
+	| (TyId(x), TyId(x))::rest ->
+	| (TyId(x), type)::rest ->
+		if occurCheck type x then raise (FalhaNoUnify "Unify falhou") else
+	| (type, TyId(x))::rest ->
+		if occurCheck type x then raise (FalhaNoUnify "Unify falhou") else
+	| (_,_) -> raise (FalhaNoUnify "Unify falhou")
+*)

@@ -185,13 +185,6 @@ let rec get_constraints (envmnt : typeEnv) (e : expr) = (
 				((procuraNoAmbiente envmnt x), [])
 		)
 )
-to aqui
-
-tentei achar mas nao consegui ai fica sem highlight
-seguinte, a gente tem q fazer o teste se é list, fn ou par no unify
-se for tem q rodar occurCheck, se occurCheck false ai substitui, senao falha de tipo
-
-isso ja ta ali em baixo, mas pq ta separado, nao entendi entao
 
 let rec occurCheck (t: tipo) (x: variable) =
 	match (t) with
@@ -216,18 +209,24 @@ let rec unify resolucao constraints =
 	| (TyId(x), TyId(x))::rest -> unify resolucao constraints (* (X,X)*)
 	| (TyId(x), type)::rest ->
 		if occurCheck type x then raise (FalhaNoUnify "Unify falhou")
-		else unify List.concat (resolucao; [(TyId(x), type)]) rest
+		else unify List.concat (resolucao; [(TyId(x), type)]) (substituiVar rest x  type)
 	| (type, TyId(x))::rest ->
 		if occurCheck type x then raise (FalhaNoUnify "Unify falhou")
 		else unify List.concat (resolucao; [(TyId(x), type)]) rest
 	| (_,_) -> raise (FalhaNoUnify "Unify falhou")
 
-olha so
-vou colocar,to colocando, aquela lista ali de parametro pra coletar essas (variavel, tipo)
-pq ela tem q coletar? tu diz a definição dela, tipo "agora X1 = int" ? (int, X1)::resolucao?
-isso aquele simbolo que eu nao sei o nome σ
-só que assim, vamos ter q testar sempre se as novas variaveis dao match com alguma de resultado ?
- nao pq vamos fazer a substituicao
-quando fizermos o occurchekc e der false fazemos a substituicao das aparicoes de x em constraints pelo tipo que encontramos
+let rec substituiVar constraints (variavel: variable) (type: tipo) =
+let head = List.hd constrains in
+match (t) with
+	 TyInt  -> TyInt
+	|TyBool -> TyBool
+	|TyList(typeE) -> List.Concat(TyList(substituiVar typeE variavel type); substituiVar List.tl constraints variavel type)
+	|TyFn(typeE1, typeE2) -> TyFn((substituiVar typeE1 variavel type), (substituiVar typeE1 variavel type))
+	|TyPair(typeE1, typeE2) -> TyPair((substituiVar typeE1 variavel type), (substituiVar typeE1 variavel type))
+	|TyId(variavel) -> if variavel = x then type else TyId(variavel)
 
-let rec substituiVar
+
+	let typeInfer (tyEnvironment: tyenv) (expression: expr) : tipo =
+  let tyT, nextuvar, tyEquations = collectTyEqs tyEnvironment expression in
+    let  tySubstitutions = unify tyEquations in
+      applySubs tySubstitutions tyT

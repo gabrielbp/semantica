@@ -1,11 +1,21 @@
 #use "sintaxe.ml"
 
 exception InputInvalido of string
+exception VariavelNaoDeclarada of string
+
+let rec procuraNoAmbienteDeExecucao (envmnt : env) (x: string) =
+		try let var = List.hd envmnt in
+			match (var) with
+			(variavel, _) when variavel = x ->  snd(var)
+			| _ -> procuraNoAmbienteDeExecucao (List.tl envmnt) x
+		with _ -> raise (VariavelNaoDeclarada "Variavel nao foi declarada")
 
 let rec evaluate (envmnt : env) (e : expr) = (
 	match e with
 		(* BS-Num *)
 		Ncte(n) -> Vnum(n)
+		(* BS-Bool *)
+		| Bcte(b) -> Vbool(b)
 		(* BS-BinOp *)
 		| Binop(op, e1, e2) -> (
 		let e1' = evaluate envmnt e1 in (
@@ -31,8 +41,6 @@ let rec evaluate (envmnt : env) (e : expr) = (
 		    )
 		  )
 		)
-		(* BS-Bool *)
-		| Bcte(b) -> Vbool(b)
 		(* BS-UnOp *)
 		| Unop(op, e1) -> (
 			let e1' = evaluate envmnt e1 in (
@@ -83,6 +91,8 @@ let rec evaluate (envmnt : env) (e : expr) = (
 				)
 			)
 		)
+		(* Id-rules*)
+		| Id(x) -> procuraNoAmbienteDeExecucao envmnt x
 		(* Application rules *)
 		| App(e1, e2) -> let e1' = evaluate envmnt e1 in
 					if e1' = RRaise then RRaise else (
@@ -102,7 +112,6 @@ let rec evaluate (envmnt : env) (e : expr) = (
 								match(e1') with
 									  RRaise -> RRaise
 									| _ -> evaluate ((x, e1')::envmnt) e2
-							)
 		(* BS-LetRec *)
 		| Letrec(f, x, e1, e2) -> let rclos = Vrclos(f, x, e1, envmnt) in evaluate ((f, rclos)::envmnt) e2
 		(*List extension rules *)
@@ -116,6 +125,16 @@ let rec evaluate (envmnt : env) (e : expr) = (
 						)
 					)
 				)
+		)
+		| IsEmpty(e1) -> (
+		let e1' = evaluate envmnt e1 in (
+		if e1' = RRaise then RRaise else (
+		match(e1') with
+		Vcons(v1, v2) -> (Vbool false)
+		| Vnil -> (Vbool true)
+		| _ -> raise (InputInvalido "Erro no type_infer")
+		)
+		)
 		)
 		| Hd(e1) -> (
 			let e1' = evaluate envmnt e1 in (
@@ -133,16 +152,6 @@ let rec evaluate (envmnt : env) (e : expr) = (
 					match(e1') with
 					  Vcons(v1, v2) -> v2
 					| Vnil -> RRaise
-					| _ -> raise (InputInvalido "Erro no type_infer")
-				)
-			)
-		)
-		| IsEmpty(e1) -> (
-			let e1' = evaluate envmnt e1 in (
-				if e1' = RRaise then RRaise else (
-					match(e1') with
-					  Vcons(v1, v2) -> (Vbool false)
-					| Vnil -> (Vbool true)
 					| _ -> raise (InputInvalido "Erro no type_infer")
 				)
 			)

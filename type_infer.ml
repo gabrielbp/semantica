@@ -198,37 +198,41 @@ let rec occurCheck (t: tipo) (x: variable) =
 		|TyId(variavel) -> if variavel = x then true else false
 
 
+let rec substituiVarAux exp variavel t =
+	match (exp) with
+		 TyInt  -> TyInt
+		|TyBool -> TyBool
+		|TyList(typeE) -> TyList(substituiVarAux typeE variavel t)
+		|TyFn(typeE1, typeE2) -> TyFn((substituiVarAux typeE1 variavel t), (substituiVarAux typeE2 variavel t))
+		|TyPair(typeE1, typeE2) -> TyPair((substituiVarAux typeE1 variavel t), (substituiVarAux typeE2 variavel t))
+		|TyId(x) -> if variavel = x then t else TyId(x)
+
 
 let rec substituiVar constraints (variavel: variable) (t: tipo) =
 	let head = List.hd constraints in
-		match (fst(head)) with
-			 TyInt  -> TyInt
-			|TyBool -> TyBool
-			|TyList(typeE) -> List.concat(TyList(substituiVar List.append(typeE; []) variavel t); substituiVar (List.tl constraints) variavel t)
-			|TyFn(typeE1, typeE2) -> List.concat(TyFn((substituiVar typeE1 variavel t), (substituiVar typeE1 variavel t)); substituiVar (List.tl constraints) variavel t)
-			|TyPair(typeE1, typeE2) -> List.concat(TyPair((substituiVar typeE1 variavel t), (substituiVar typeE1 variavel t)); substituiVar (List.tl constraints) variavel t)
-			|TyId(variavel) -> if variavel = x then t else TyId(variavel)
+		((substituiVarAux (fst head) variavel t), (substituiVarAux (snd head) variavel t))::(substituiVar (List.tl constraints) variavel t)
 
-
-let rec unify resolucao constraints =
+let rec unify constraints =
  	match(constraints) with
 	  [] -> []
-	| (TyInt, TyInt)::rest -> unify resolucao rest
-	| (TyBool, TyBool)::rest -> unify resolucao rest
-	| (TyList(typeE1), TyList(typeE2))::rest -> unify resolucao ((typeE1, typeE2)::rest)
-	| (TyFn(typeE1, typeE2), TyFn(typeE3, typeE4))::rest -> unify resolucao ((typeE1, typeE3)::(typeE2, typeE4)::rest)
-	| (TyPair(typeE1, typeE2), TyPair(typeE3, typeE4))::rest -> unify resolucao ((typeE1, typeE3)::(typeE2, typeE4)::rest)
-	| (TyId(x), TyId(y))::rest when x = y -> unify resolucao constraints (* (X,X)*)
+	| (TyInt, TyInt)::rest -> (unify rest)
+	| (TyBool, TyBool)::rest -> (unify rest)
+	| (TyList(typeE1), TyList(typeE2))::rest -> (unify ((typeE1, typeE2)::rest))
+	| (TyFn(typeE1, typeE2), TyFn(typeE3, typeE4))::rest -> (unify ((typeE1, typeE3)::(typeE2, typeE4)::rest))
+	| (TyPair(typeE1, typeE2), TyPair(typeE3, typeE4))::rest -> (unify ((typeE1, typeE3)::(typeE2, typeE4)::rest))
+	| (TyId(x), TyId(y))::rest when x = y -> (unify constraints) (* (X,X)*)
 	| (TyId(x), tipo)::rest ->
-		(if occurCheck tipo x then raise (FalhaNoUnify "Unify falhou")
-		else (unify (List.append (resolucao; [(TyId(x), tipo)])) (substituiVar rest x  tipo)))
+		(	if occurCheck tipo x then raise (FalhaNoUnify "Unify falhou")
+			else [(TyId(x), tipo)]::(unify (substituiVar rest x  tipo))
+		)
 	| (tipo, TyId(x))::rest ->
-		(if occurCheck tipo x then raise (FalhaNoUnify "Unify falhou")
-		else unify List.append (resolucao; [(TyId(x), tipo)]) rest) (substituiVar rest x  tipo)
+		(	if occurCheck tipo x then raise (FalhaNoUnify "Unify falhou")
+			else [(TyId(x), tipo)]::(unify (substituiVar rest x  tipo))
+		)
 	| _ -> raise (FalhaNoUnify "Unify falhou")
 
 
 
 let typeInfer (expression: expr) =
   let equations = get_constraints [] expression in
-    let  resolucao = unify [] equations in resolucao
+    (unify (snd equations))

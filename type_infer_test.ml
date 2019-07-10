@@ -2,7 +2,7 @@
 
 let num_test = get_constraints [] (Ncte(1));; (* deve retornar  (TyInt, []) *)
 
-let id_test = get_constraints [] (Fn("X", Binop(Sum, Id("Y"), Ncte(5))));; (* deve retornar  Vnum 5 *)
+let id_test = get_constraints [] (Fn("X", Binop(Sum, Id("X"), Ncte(5))));; (* deve retornar  Vnum 5 *)
 
 let div_test = get_constraints [] (Binop(Div, Ncte(10), Ncte(2)));; (* deve retornar  Vnum 5 *)
 
@@ -25,3 +25,7 @@ let isempty_test = get_constraints [] (IsEmpty(Cons(Bcte(true), Bcte(false))));;
 let try_test = get_constraints [] (Try((Binop(Le, Ncte(5), Ncte(2))), (Binop(And, Bcte(true), Bcte(true)))));; (* deve retornar  Vbool false *)
 
 let try_test_ex = get_constraints [] (Try((Binop(Sum, Ncte(5), Bcte(true))), (Binop(Or, Bcte(true), Bcte(false)))));; (* deve retornar  Vbool true *)
+
+let teste_type_infer = typeInfer (Pair(Ncte(1), Bcte(true)));;
+
+let teste_type_infer2 = typeInfer (Let("x", Binop(Sum, Ncte(5), Ncte(3)), Binop(Mult, Id("x"), Id("x"))));;

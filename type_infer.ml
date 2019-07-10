@@ -209,8 +209,10 @@ let rec substituiVarAux exp variavel t =
 
 
 let rec substituiVar constraints (variavel: variable) (t: tipo) =
-	let head = List.hd constraints in
-		((substituiVarAux (fst head) variavel t), (substituiVarAux (snd head) variavel t))::(substituiVar (List.tl constraints) variavel t)
+	if (constraints <> []) then (
+		let head = List.hd constraints in
+			((substituiVarAux (fst head) variavel t), (substituiVarAux (snd head) variavel t)::(substituiVar (List.tl constraints) variavel t))
+	) else RRaise
 
 let rec unify constraints =
  	match(constraints) with

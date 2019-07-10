@@ -112,6 +112,7 @@ let rec evaluate (envmnt : env) (e : expr) = (
 								match(e1') with
 									  RRaise -> RRaise
 									| _ -> evaluate ((x, e1')::envmnt) e2
+							)
 		(* BS-LetRec *)
 		| Letrec(f, x, e1, e2) -> let rclos = Vrclos(f, x, e1, envmnt) in evaluate ((f, rclos)::envmnt) e2
 		(*List extension rules *)

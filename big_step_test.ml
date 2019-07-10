@@ -28,4 +28,21 @@ let try_test = evaluate [] (Try((Binop(Le, Ncte(5), Ncte(2))), (Binop(And, Bcte(
 
 let try_test_ex = evaluate [] (Try((Binop(Sum, Ncte(5), Bcte(true))), (Binop(Or, Bcte(true), Bcte(false)))));; (* deve retornar  Vbool true *)
 
+let let_test = evaluate [] (Let("x", Binop(Sum, Ncte(5), Ncte(3)), Binop(Mult, Id("x"), Id("x"))));; (* must return Vnum 64 *)
+
+let letrec_test = evaluate [] (Letrec("fat",
+				    "x",
+				    If(Binop(Eq, Id("x"), Ncte(0)),
+						Ncte(1),
+						Binop(Mult,
+						      Id("x"),
+						      App(Id("fat"),
+							  Binop(Sub, Id("x"), Ncte(1))
+						      )
+						)
+				    ),
+				    App(Id("fat"), Ncte(6))
+			       )
+			      );; (* fat 6: must return Vnum 720 *)
+
 let mult_test_r = evaluate [] (Binop(Mult, Ncte(2), Bcte(true)));; (* deve retornar  RRaise *)

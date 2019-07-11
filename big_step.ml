@@ -128,14 +128,14 @@ let rec evaluate (envmnt : env) (e : expr) = (
 				)
 		)
 		| IsEmpty(e1) -> (
-		let e1' = evaluate envmnt e1 in (
-		if e1' = RRaise then RRaise else (
-		match(e1') with
-		Vcons(v1, v2) -> (Vbool false)
-		| Vnil -> (Vbool true)
-		| _ -> raise (InputInvalido "Erro no type_infer")
-		)
-		)
+			let e1' = evaluate envmnt e1 in (
+				if e1' = RRaise then RRaise else (
+					match(e1') with
+						Vcons(v1, v2) -> (Vbool false)
+						| Vnil -> (Vbool true)
+						| _ -> raise (InputInvalido "Erro no type_infer")
+				)
+			)
 		)
 		| Hd(e1) -> (
 			let e1' = evaluate envmnt e1 in (
